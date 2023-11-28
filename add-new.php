@@ -1,37 +1,55 @@
 <?php
-include 'connexion.php';
+include "connexion.php";
 
-// Fetch all users from the database
-$sql = "SELECT * FROM users";
-$result = mysqli_query($con, $sql);
-
-// Organize users by team
-$usersByTeam = array();
-
-while ($row = mysqli_fetch_assoc($result)) {
-    $team = $row['nom_equipe'];
-
-    // Create an array for the team if it doesn't exist
-    if (!isset($usersByTeam[$team])) {
-        $usersByTeam[$team] = array();
-    }
-
-    // Add the user to the team array
-    $usersByTeam[$team][] = $row;
+if (!$con) {
+    die("Connection failed: " . mysqli_connect_error());
 }
 
-// Close the database connection
-mysqli_close($con);
-?>
+if (isset($_POST["submit"])) {
+
+
+    $nom_equipe = $_POST['nom_equipe'];
+
+    $description_equipe = $_POST['description_equipe'];
+    $date_creation_equipe = $_POST['date_creation_equipe'];
+    $responsable_equipe = $_POST['responsable_equipe'];
+
+    echo "Nom d'équipe: $nom_equipe<br>";
+    echo "Description d'équipe: $description_equipe<br>";
+    echo "Date de création: $date_creation_equipe<br>";
+    echo "Responsable d'équipe: $responsable_equipe<br>";
+ 
+    $sql = "INSERT INTO equipe (nom_equipe, description_equipe, date_creation_equipe, responsable_equipe) VALUES ('$nom_equipe', '$description_equipe', '$date_creation_equipe', '$responsable_equipe')";
+
+ 
+    $result = mysqli_query($con, $sql);
+ 
+    if ($result) {
+       header("Location: equipe.php");
+    } else {
+       echo "Failed: " . mysqli_error($con);
+    }
+ }
+ ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tableau des équipes</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+   <!-- Tailwind CSS -->
+   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+   <!-- Font Awesome -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+   <title>Document</title>
 </head>
+
 <body>
 <nav class="bg-gray-800">
   <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -66,8 +84,8 @@ mysqli_close($con);
         <div class="hidden sm:ml-6 sm:block">
           <div class="flex space-x-4">
             <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-            <a href="interface" class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page">Membres</a>
-            <a href="equipe.php" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Team</a>
+            <a href="#" class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page">Dashboard</a>
+            <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Team</a>
             <a href="project.php" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Projects</a>
             
           </div>
@@ -120,32 +138,51 @@ mysqli_close($con);
   </div>
 </nav>
 
-<div class="container mx-auto bg-white p-8 rounded-md shadow-md">
-    <h1 class="text-2xl font-bold mb-4">Tableau des équipes</h1>
-    <a href="add-new.php" class="bg-gray-800 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-600 focus:outline-none focus:shadow-outline-gray active:bg-gray-800">
-        Ajouter Nouveau
-    </a>
+   <div class="container mx-auto">
+      <div class="text-center mb-4">
+         <h3 class="text-3xl">Add New User</h3>
+         <p class="text-gray-600">Complete the form below to add a new user</p>
+      </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <?php foreach ($usersByTeam as $team => $users) : ?>
-            <?php foreach ($users as $user) : ?>
-                <div class="bg-white p-6 rounded-md shadow-md">
-                    <h2 class="text-xl font-bold mb-2"><?= $user['nom'] ?> <?= $user['prenom'] ?></h2>
-                    <p class="text-gray-500 mb-4"><?= $user['email'] ?></p>
-                    <p class="text-gray-500 mb-4">Équipe: <?= $user['nom_equipe'] ?></p>
-                    <div class="flex">
-                        <a href='modifier.php?id=<?= $user['id_user'] ?>' class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
-                            Modifier
-                        </a>
-                        <a href='delete.php?id=<?= $user['id_user'] ?>' class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                            Supprimer
-                        </a>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        <?php endforeach; ?>
+      <div class="flex justify-center">
+      <form action="" method="post">
+            <div class="mb-4">
+                <label for="nom_equipe" class="block text-gray-700 text-sm font-bold mb-2">Nom de l'équipe:</label>
+                <input type="text" name="nom_equipe" id="nom_equipe" class="border rounded-md px-3 py-2 w-full" required>
+            </div>
+            <div class="mb-4">
+                <label for="description_equipe" class="block text-gray-700 text-sm font-bold mb-2">Description de l'équipe:</label>
+                <textarea name="description_equipe" id="description_equipe" class="border rounded-md px-3 py-2 w-full" required></textarea>
+            </div>
+            <div class="mb-4">
+                <label for="date_creation_equipe" class="block text-gray-700 text-sm font-bold mb-2">Date de création:</label>
+                <input type="date" name="date_creation_equipe" id="date_creation_equipe" class="border rounded-md px-3 py-2 w-full" required>
+            </div>
+            <div class="mb-4">
+        <label for="responsable_equipe" class="block text-gray-700 text-sm font-bold mb-2">Responsable de l'équipe:</label>
+        <select name="responsable_equipe" id="responsable_equipe" class="border rounded-md px-3 py-2 w-full" required>
+        <?php
+    // Assuming $con is your database connection
+    $query = "SELECT id_user, CONCAT(nom, ' ', prenom) AS nom_complet FROM users";
+    $result = mysqli_query($con, $query);
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        echo "<option value='{$row['id_user']}'>{$row['nom_complet']}</option>";
+    }
+?>
+
+        </select>
     </div>
-</div>
+            <div>
+                <button type="submit" name="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700">Ajouter Equipe</button>
+            </div>
+        </form>
+      </div>
+   </div>
+
+   <!-- Bootstrap -->
+  
 
 </body>
+
 </html>

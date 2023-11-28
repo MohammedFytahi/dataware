@@ -1,38 +1,24 @@
 <?php
-include 'connexion.php';
+// Inclure le fichier de connexion à la base de données (connexion.php)
+include "connexion.php";
 
-// Fetch all users from the database
-$sql = "SELECT * FROM users";
-$result = mysqli_query($con, $sql);
-
-// Organize users by team
-$usersByTeam = array();
-
-while ($row = mysqli_fetch_assoc($result)) {
-    $team = $row['nom_equipe'];
-
-    // Create an array for the team if it doesn't exist
-    if (!isset($usersByTeam[$team])) {
-        $usersByTeam[$team] = array();
-    }
-
-    // Add the user to the team array
-    $usersByTeam[$team][] = $row;
-}
-
-// Close the database connection
-mysqli_close($con);
+// Récupérer les données des équipes depuis la base de données (exemple)
+$query = "SELECT * FROM equipe";
+$result = mysqli_query($con, $query);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tableau des équipes</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <!-- Les balises head avec les métadonnées, les styles, etc. -->
+    <title>Liste des Équipes</title>
+    <!-- Inclure la feuille de style de Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
+
+<body class="bg-gray-100">
+
 <nav class="bg-gray-800">
   <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
     <div class="relative flex h-16 items-center justify-between">
@@ -41,19 +27,11 @@ mysqli_close($con);
         <button type="button" class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
           <span class="absolute -inset-0.5"></span>
           <span class="sr-only">Open main menu</span>
-          <!--
-            Icon when menu is closed.
-
-            Menu open: "hidden", Menu closed: "block"
-          -->
+          <!-- Icon when menu is closed. Menu open: "hidden", Menu closed: "block" -->
           <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
           </svg>
-          <!--
-            Icon when menu is open.
-
-            Menu open: "block", Menu closed: "hidden"
-          -->
+          <!-- Icon when menu is open. Menu open: "block", Menu closed: "hidden" -->
           <svg class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -65,11 +43,9 @@ mysqli_close($con);
         </div>
         <div class="hidden sm:ml-6 sm:block">
           <div class="flex space-x-4">
-            <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-            <a href="interface" class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page">Membres</a>
+            <a href="interface.php" class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page">Membres</a>
             <a href="equipe.php" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Team</a>
             <a href="project.php" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Projects</a>
-            
           </div>
         </div>
       </div>
@@ -82,7 +58,6 @@ mysqli_close($con);
           </svg>
         </button>
 
-        <!-- Profile dropdown -->
         <div class="relative ml-3">
           <div>
             <button type="button" class="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
@@ -91,61 +66,41 @@ mysqli_close($con);
               <img class="h-8 w-8 rounded-full" src="https://intranet.youcode.ma/storage/users/profile/thumbnail/766-1696615639.jpg" alt="">
             </button>
           </div>
-
-          <!--
-            Dropdown menu, show/hide based on menu state.
-
-            Entering: "transition ease-out duration-100"
-              From: "transform opacity-0 scale-95"
-              To: "transform opacity-100 scale-100"
-            Leaving: "transition ease-in duration-75"
-              From: "transform opacity-100 scale-100"
-              To: "transform opacity-0 scale-95"
-          -->
-          
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Mobile menu, show/hide based on menu state. -->
   <div class="sm:hidden" id="mobile-menu">
     <div class="space-y-1 px-2 pb-3 pt-2">
-      <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
       <a href="#" class="bg-gray-900 text-white block rounded-md px-3 py-2 text-base font-medium" aria-current="page">Dashboard</a>
       <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Team</a>
       <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Projects</a>
-      
     </div>
   </div>
 </nav>
 
-<div class="container mx-auto bg-white p-8 rounded-md shadow-md">
-    <h1 class="text-2xl font-bold mb-4">Tableau des équipes</h1>
-    <a href="add-new.php" class="bg-gray-800 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-600 focus:outline-none focus:shadow-outline-gray active:bg-gray-800">
-        Ajouter Nouveau
-    </a>
+<div class="container mx-auto mt-8">
+    <h2 class="text-3xl font-bold my-4">Liste des Équipes</h2>
+    <div class="mb-4 space-x-4">
+        <a href="add-new.php" class="bg-gray-800 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-600 focus:outline-none focus:shadow-outline-gray active:bg-gray-800">Créer une équipe</a>
+        <a href="ajout.php" class="bg-gray-800 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-600 focus:outline-none focus:shadow-outline-gray active:bg-gray-800">Ajouter un membre</a>
+        <a href="sequipe.php" class="bg-gray-800 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-600 focus:outline-none focus:shadow-outline-gray active:bg-gray-800">  Supprimer membre</a>
+    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <?php foreach ($usersByTeam as $team => $users) : ?>
-            <?php foreach ($users as $user) : ?>
-                <div class="bg-white p-6 rounded-md shadow-md">
-                    <h2 class="text-xl font-bold mb-2"><?= $user['nom'] ?> <?= $user['prenom'] ?></h2>
-                    <p class="text-gray-500 mb-4"><?= $user['email'] ?></p>
-                    <p class="text-gray-500 mb-4">Équipe: <?= $user['nom_equipe'] ?></p>
-                    <div class="flex">
-                        <a href='modifier.php?id=<?= $user['id_user'] ?>' class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
-                            Modifier
-                        </a>
-                        <a href='delete.php?id=<?= $user['id_user'] ?>' class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                            Supprimer
-                        </a>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        <?php endforeach; ?>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <?php while ($row = mysqli_fetch_assoc($result)) : ?>
+            <div class="bg-white p-4 rounded-md shadow-md">
+                <strong class="block text-xl font-semibold mb-2"><?php echo $row['nom_equipe']; ?></strong>
+                <p class="text-gray-700"><?php echo $row['description_equipe']; ?></p>
+                <p class="text-gray-600 mt-2">Date de création: <?php echo $row['date_creation_equipe']; ?></p>
+                <a href="mequipe.php?id=<?php echo $row['id_equipe']; ?>" class="text-blue-500 hover:text-blue-800 mt-2 block">Modifier</a>
+               
+            </div>
+        <?php endwhile; ?>
     </div>
 </div>
 
 </body>
+
 </html>
