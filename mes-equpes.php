@@ -1,36 +1,16 @@
 <?php
-include 'connexion.php';
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
-
+include "connexion.php";
+$message = "";
 session_start();
-if( $_SESSION['autoriser']!= "oui"){
-  header("location : index.php");
-  exit();
+if ($_SESSION['autoriser'] != "oui") {
+    header("Location: index.php");
+    exit();
 }
 
-$sql = "SELECT * FROM users";
-$result = mysqli_query($con, $sql);
-
-// Organize users by team
-$usersByTeam = array();
-
-while ($row = mysqli_fetch_assoc($result)) {
-    $team = $row['nom_equipe'];
-
-    
-    if (!isset($usersByTeam[$team])) {
-        $usersByTeam[$team] = array();
-    }
-
-    
-    $usersByTeam[$team][] = $row;
-}
-
-
-mysqli_close($con);
+$user = $_SESSION['username'];
+$membre = $_SESSION['id'];
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -45,15 +25,23 @@ mysqli_close($con);
   <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
     <div class="relative flex h-16 items-center justify-between">
       <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
-       
+        <!-- Mobile menu button-->
         <button type="button" class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
           <span class="absolute -inset-0.5"></span>
           <span class="sr-only">Open main menu</span>
-         
+          <!--
+            Icon when menu is closed.
+
+            Menu open: "hidden", Menu closed: "block"
+          -->
           <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
           </svg>
-        
+          <!--
+            Icon when menu is open.
+
+            Menu open: "block", Menu closed: "hidden"
+          -->
           <svg class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -66,9 +54,9 @@ mysqli_close($con);
         <div class="hidden sm:ml-6 sm:block">
           <div class="flex space-x-4">
             <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-            <a href="interface.php" class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page">Membres</a>
-            <a href="equipU.php" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Team</a>
-            <a href="project.php" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Projects</a>
+            <a href="#" class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page">Membres</a>
+            <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Team</a>
+            <a href="mes-projet.php" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Projects</a>
             
           </div>
         </div>
@@ -92,14 +80,23 @@ mysqli_close($con);
             </button>
           </div>
 
-         
+          <!--
+            Dropdown menu, show/hide based on menu state.
+
+            Entering: "transition ease-out duration-100"
+              From: "transform opacity-0 scale-95"
+              To: "transform opacity-100 scale-100"
+            Leaving: "transition ease-in duration-75"
+              From: "transform opacity-100 scale-100"
+              To: "transform opacity-0 scale-95"
+          -->
           
         </div>
       </div>
     </div>
   </div>
 
- 
+  <!-- Mobile menu, show/hide based on menu state. -->
   <div class="sm:hidden" id="mobile-menu">
     <div class="space-y-1 px-2 pb-3 pt-2">
       <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
@@ -111,40 +108,46 @@ mysqli_close($con);
   </div>
 </nav>
 
-<div class="container mx-auto bg-white p-8 rounded-md shadow-md">
-    <h1 class="text-2xl font-bold mb-4">Tableau des équipes</h1>
-    
+<h5 class="mt-2 ms-2 text-xl font-semibold">Bienvenue <?php echo $user; ?> !</h5>
+<h1 class="text-center mt-5 mb-5 text-3xl font-bold">Mes équipes</h1>
 
-    <table class="min-w-full border border-gray-300 mt-4">
-        <thead>
-            <tr>
-                <th class="border border-gray-300 px-4 py-2">Nom</th>
-                <th class="border border-gray-300 px-4 py-2">Prénom</th>
-                <th class="border border-gray-300 px-4 py-2">Email</th>
-                <th class="border border-gray-300 px-4 py-2">Équipe</th>
-                <th class="border border-gray-300 px-4 py-2">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($usersByTeam as $team => $users) : ?>
-                <?php foreach ($users as $user) : ?>
-                    <tr>
-                        <td class="border border-gray-300 px-4 py-2"><?= $user['nom'] ?></td>
-                        <td class="border border-gray-300 px-4 py-2"><?= $user['prenom'] ?></td>
-                        <td class="border border-gray-300 px-4 py-2"><?= $user['email'] ?></td>
-                        <td class="border border-gray-300 px-4 py-2"><?= $user['nom_equipe'] ?></td>
-                        <td class="border border-gray-300 px-4 py-2">
-                            <a href='modifier.php?id=<?= $user['id_user'] ?>' class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
-                                Modifier
-                            </a>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+<div class="container mt-4">
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-4">
+        <div class="col-span-1">
+            <div class="overflow-x-auto">
+                <table class="table-auto w-full bg-primary mt-4 table-hover">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4 text-light">Nom d'équipe</th>
+                            <th class="py-2 px-4 text-light">Date de création</th>
+                        </tr>
+                    </thead>
+                    <?php
+                    $req = mysqli_query($con, "SELECT * FROM equipe INNER JOIN users ON equipe.id_equipe = users.id_equipe  WHERE id_user=$membre ");
+                    if (mysqli_num_rows($req) == 0) {
+                      $message = "<span class='text-red-500'>pas encore d'equipe.</span>";
+                    } else {
+                        while ($row = mysqli_fetch_array($req)) {
+                    ?>
+                            <tbody class="table-light">
+                                <tr>
+                                    <td class="py-2 px-4"><?= $row['nom_equipe']; ?></td>
+                                    <td class="py-2 px-4"><?php echo $row['date_creation_equipe']; ?></td>
+                                </tr>
+                            </tbody>
+                    <?php
+                        }
+                    }
+                    ?>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
+<p class="text-center mt-5 text-lg font-bold text-danger"><?php echo $message; ?></p>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
+
 </html>

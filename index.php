@@ -1,37 +1,38 @@
-<?php 
-include("connexion.php");
-session_start();
-
-if (isset($_POST['submit'])) {
-    $email = htmlspecialchars($_POST['email']);
-    $password = htmlspecialchars($_POST['password']);
-    $query = "SELECT * FROM users WHERE email='$email' && password='$password' ";
-    $result = mysqli_query($con, $query);
-
-    if (mysqli_num_rows($result) > 0) {
-        $user = mysqli_fetch_assoc($result);
-        $_SESSION['email'] = $email;
-        $_SESSION['role'] = $user['role'];
-
-        switch ($user['role']) {
-            case 'product_owner':
-                header("location: dashboard.php");
-                exit();
-            case 'scrum_master':
-                header("location: interface.php");
-                exit();
-            case 'User':
-                header("location: usdashboard.php");
-                exit();
-            default:
-                echo "Unknown role";
-        }
-    } else {
-        echo "Email ou mot de passe incorrect";
+<?php
+include "connexion.php";
+$erreur="";
+if (isset($_POST["submit"])){
+  
+  $email=$_POST["email"];
+  $pass=$_POST["password"];
+  $select="SELECT * FROM users WHERE email= '$email' AND password= '$pass'";
+  $query = mysqli_query($con,$select);
+  $row = mysqli_num_rows($query);
+  $fetch = mysqli_fetch_array($query);
+  if($row == 1){
+    $username=$fetch['prenom'];
+    $membre=$fetch['id_user'];
+    session_start();
+    $_SESSION['username']=$username;
+    $_SESSION['id']=$membre;
+    $_SESSION['autoriser']= "oui";
+    if($fetch["role"]== "user"){
+      header("Location: mes-equpes.php");
     }
-}
-?>
+    elseif($fetch["role"]== "scrum_master"){
+      header("Location: home.php");
+    }
+    else
+     header("Location: project.php");
 
+  } 
+  else
+   $erreur="L’adresse e-mail ou le mot de passe que vous avez saisi(e) n’est pas associé(e) à un compte. ";
+
+}
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,51 +44,51 @@ if (isset($_POST['submit'])) {
 <body>
     <script>
         tailwind.config = {
-  darkMode: 'class',
-  theme: {
-    extend: {
-      colors: {
-        primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a","950":"#172554"}
-      }
-    },
-    fontFamily: {
-      'body': [
-    'Inter', 
-    'ui-sans-serif', 
-    'system-ui', 
-    '-apple-system', 
-    'system-ui', 
-    'Segoe UI', 
-    'Roboto', 
-    'Helvetica Neue', 
-    'Arial', 
-    'Noto Sans', 
-    'sans-serif', 
-    'Apple Color Emoji', 
-    'Segoe UI Emoji', 
-    'Segoe UI Symbol', 
-    'Noto Color Emoji'
-  ],
-      'sans': [
-    'Inter', 
-    'ui-sans-serif', 
-    'system-ui', 
-    '-apple-system', 
-    'system-ui', 
-    'Segoe UI', 
-    'Roboto', 
-    'Helvetica Neue', 
-    'Arial', 
-    'Noto Sans', 
-    'sans-serif', 
-    'Apple Color Emoji', 
-    'Segoe UI Emoji', 
-    'Segoe UI Symbol', 
-    'Noto Color Emoji'
-  ]
-    }
-  }
-}
+          darkMode: 'class',
+          theme: {
+            extend: {
+              colors: {
+                primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a","950":"#172554"}
+              }
+            },
+            fontFamily: {
+              'body': [
+                'Inter', 
+                'ui-sans-serif', 
+                'system-ui', 
+                '-apple-system', 
+                'system-ui', 
+                'Segoe UI', 
+                'Roboto', 
+                'Helvetica Neue', 
+                'Arial', 
+                'Noto Sans', 
+                'sans-serif', 
+                'Apple Color Emoji', 
+                'Segoe UI Emoji', 
+                'Segoe UI Symbol', 
+                'Noto Color Emoji'
+              ],
+              'sans': [
+                'Inter', 
+                'ui-sans-serif', 
+                'system-ui', 
+                '-apple-system', 
+                'system-ui', 
+                'Segoe UI', 
+                'Roboto', 
+                'Helvetica Neue', 
+                'Arial', 
+                'Noto Sans', 
+                'sans-serif', 
+                'Apple Color Emoji', 
+                'Segoe UI Emoji', 
+                'Segoe UI Symbol', 
+                'Noto Color Emoji'
+              ]
+            }
+          }
+        }
     </script>
     <section class="bg-gray-50 dark:bg-gray-900">
         <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -100,7 +101,7 @@ if (isset($_POST['submit'])) {
                     <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                         Sign in to your account
                     </h1>
-                    <form action="regex.php" method="POST" class="space-y-4 md:space-y-6" >
+                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="POST" class="space-y-4 md:space-y-6">
                         <div>
                             <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
                             <input type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@company.com" required="">
@@ -110,14 +111,7 @@ if (isset($_POST['submit'])) {
                             <input type="password" name="password" id="password" placeholder="••••••••" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required="">
                         </div>
                         <div class="flex items-center justify-between">
-                            <div class="flex items-start">
-                                <div class="flex items-center h-5">
-                                  <input id="remember" aria-describedby="remember" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required="">
-                                </div>
-                                <div class="ml-3 text-sm">
-                                  <label for="remember" class="text-gray-500 dark:text-gray-300">Remember me</label>
-                                </div>
-                            </div>
+                            
                             <a href="#" class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">Forgot password?</a>
                         </div>
                         <button type="submit" name="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Sign in</button>

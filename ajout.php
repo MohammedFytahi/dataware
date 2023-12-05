@@ -16,8 +16,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $equipeResult = mysqli_query($con, $equipeQuery);
 
     if (mysqli_num_rows($userResult) > 0 && mysqli_num_rows($equipeResult) > 0) {
-        // Mettre à jour le champ nom_equipe dans la table users
-        $updateQuery = "UPDATE users SET nom_equipe = (SELECT nom_equipe FROM equipe WHERE id_equipe = $id_equipe) WHERE id_user = $id_user";
+        // Mettre à jour le champ nom_equipe et id_equipe dans la table users
+        $updateQuery = "UPDATE users SET nom_equipe = (SELECT nom_equipe FROM equipe WHERE id_equipe = $id_equipe), id_equipe = $id_equipe WHERE id_user = $id_user";
         $resultUpdate = mysqli_query($con, $updateQuery);
 
         if ($resultUpdate) {
@@ -35,7 +35,7 @@ $queryEquipe = "SELECT * FROM equipe";
 $resultEquipe = mysqli_query($con, $queryEquipe);
 
 // Récupérer les données des utilisateurs depuis la base de données (exemple)
-$queryUser = "SELECT * FROM users";
+$queryUser = "SELECT users.*, equipe.nom_equipe, equipe.id_equipe FROM users LEFT JOIN equipe ON users.id_equipe = equipe.id_equipe";
 $resultUser = mysqli_query($con, $queryUser);
 ?>
 
@@ -71,7 +71,7 @@ $resultUser = mysqli_query($con, $queryUser);
                 <label for="id_user" class="block text-gray-700 text-sm font-bold mb-2">Sélectionner Utilisateur:</label>
                 <select id="id_user" name="id_user" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                     <?php while ($rowUser = mysqli_fetch_assoc($resultUser)) : ?>
-                        <option value="<?php echo $rowUser['id_user']; ?>"><?php echo $rowUser['nom'] . ' ' . $rowUser['prenom']; ?></option>
+                        <option value="<?php echo $rowUser['id_user']; ?>"><?php echo $rowUser['nom'] . ' ' . $rowUser['prenom'] . ' - ' . $rowUser['nom_equipe'] . ' (ID équipe: ' . $rowUser['id_equipe'] . ')'; ?></option>
                     <?php endwhile; ?>
                 </select>
             </div>

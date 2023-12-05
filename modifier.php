@@ -1,11 +1,9 @@
 <?php
-
 include 'connexion.php';
 
 if (isset($_GET['id'])) {
     $userId = $_GET['id'];
 
-   
     $query = "SELECT * FROM users WHERE id_user = $userId";
     $result = mysqli_query($con, $query);
 
@@ -20,18 +18,15 @@ if (isset($_GET['id'])) {
     exit();
 }
 
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $updatedName = $_POST['updated_name'];
     $updatedEmail = $_POST['updated_email'];
     $updatedRole = $_POST['updated_role'];
 
-  
     $updateQuery = "UPDATE users SET nom = '$updatedName', email = '$updatedEmail', role = '$updatedRole' WHERE id_user = $userId";
     $updateResult = mysqli_query($con, $updateQuery);
 
     if ($updateResult) {
-       
         header("Location: interface.php");
         exit();
     } else {
@@ -39,14 +34,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modifier Utilisateur</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
 </head>
+
 <body class="bg-gray-200">
     <h2 class="text-center font-bold text-3xl m-10">Modifier Information Utilisateur</h2>
 
@@ -64,7 +62,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="mb-4">
                 <label for="updated_role" class="block text-gray-700 text-sm font-bold mb-2">Role:</label>
-                <input type="text" id="updated_role" name="updated_role" value="<?= $userData['role'] ?>" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <select id="updated_role" name="updated_role" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <option value="user" <?= $userData['role'] === 'user' ? 'selected' : '' ?>>User</option>
+
+                    <option value="scrum_master" <?= $userData['role'] === 'scrum_master' ? 'selected' : '' ?>>Scrum Master</option>
+                </select>
             </div>
 
             <div class="flex items-center justify-between">
@@ -78,4 +80,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
     </div>
 </body>
+
 </html>
