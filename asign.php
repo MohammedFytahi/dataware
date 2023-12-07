@@ -85,4 +85,19 @@ if (isset($_POST["submit"])) {
 
 </body>
 </html>
+<div class="mb-4">
+        <label for="responsable_equipe" class="block text-gray-700 text-sm font-bold mb-2">Responsable de l'équipe:</label>
+        <select name="responsable_equipe" id="responsable_equipe" class="border rounded-md px-3 py-2 w-full" required>
+        <?php
+    // Assuming $con is your database connection
+    $query = "SELECT id_user, CONCAT(nom, ' ', prenom) AS nom_complet FROM users";
+    $result = mysqli_query($con, $query);
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        echo "<option value='{$row['id_user']}'>{$row['nom_complet']}</option>";
+    }
+?>
+
+        </select>
+    </div>
 

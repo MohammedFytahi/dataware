@@ -12,14 +12,14 @@ if (isset($_POST["submit"])) {
 
     $description_equipe = $_POST['description_equipe'];
     $date_creation_equipe = $_POST['date_creation_equipe'];
-    $responsable_equipe = $_POST['responsable_equipe'];
+   
 
     echo "Nom d'équipe: $nom_equipe<br>";
     echo "Description d'équipe: $description_equipe<br>";
     echo "Date de création: $date_creation_equipe<br>";
-    echo "Responsable d'équipe: $responsable_equipe<br>";
  
-    $sql = "INSERT INTO equipe (nom_equipe, description_equipe, date_creation_equipe, responsable_equipe) VALUES ('$nom_equipe', '$description_equipe', '$date_creation_equipe', '$responsable_equipe')";
+ 
+    $sql = "INSERT INTO equipe (nom_equipe, description_equipe, date_creation_equipe ) VALUES ('$nom_equipe', '$description_equipe', '$date_creation_equipe')";
 
  
     $result = mysqli_query($con, $sql);
@@ -110,16 +110,7 @@ if (isset($_POST["submit"])) {
             </button>
           </div>
 
-          <!--
-            Dropdown menu, show/hide based on menu state.
-
-            Entering: "transition ease-out duration-100"
-              From: "transform opacity-0 scale-95"
-              To: "transform opacity-100 scale-100"
-            Leaving: "transition ease-in duration-75"
-              From: "transform opacity-100 scale-100"
-              To: "transform opacity-0 scale-95"
-          -->
+        
           
         </div>
       </div>
@@ -158,21 +149,7 @@ if (isset($_POST["submit"])) {
                 <label for="date_creation_equipe" class="block text-gray-700 text-sm font-bold mb-2">Date de création:</label>
                 <input type="date" name="date_creation_equipe" id="date_creation_equipe" class="border rounded-md px-3 py-2 w-full" required>
             </div>
-            <div class="mb-4">
-        <label for="responsable_equipe" class="block text-gray-700 text-sm font-bold mb-2">Responsable de l'équipe:</label>
-        <select name="responsable_equipe" id="responsable_equipe" class="border rounded-md px-3 py-2 w-full" required>
-        <?php
-    // Assuming $con is your database connection
-    $query = "SELECT id_user, CONCAT(nom, ' ', prenom) AS nom_complet FROM users";
-    $result = mysqli_query($con, $query);
-
-    while ($row = mysqli_fetch_assoc($result)) {
-        echo "<option value='{$row['id_user']}'>{$row['nom_complet']}</option>";
-    }
-?>
-
-        </select>
-    </div>
+            
             <div>
                 <button type="submit" name="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700">Ajouter Equipe</button>
             </div>
